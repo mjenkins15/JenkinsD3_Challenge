@@ -1,9 +1,10 @@
 // The code for the chart is wrapped inside a function
 // that automatically resizes the chart
+console.log("This is working!!!");
 function makeResponsive() {
 
-    // If the SVG area isn't empty when the browser loads, remove it
-    // and replace it with a resized version of the chart
+// If the SVG area isn't empty when the browser loads, remove it
+// and replace it with a resized version of the chart
     var svgArea = d3.select("body").select("svg");
     // Clear SVG 
     if (!svgArea.empty()) {
@@ -15,16 +16,17 @@ function makeResponsive() {
     var svgWidth = window.innerWidth;
     var svgHeight = window.innerHeight;
 
-// Define SVG area dimensions
-var svgWidth = 960;
-var svgHeight = 500;
+    // Define SVG area dimensions
+    var svgWidth = 960;
+    var svgHeight = 600;
 
-var margin = {
-  top: 20,
-  right: 40,
-  bottom: 60,
-  left: 100
-};
+    // Define the chart's margins as an object
+    var margin = {
+    top: 20,
+    right: 40,
+    bottom: 60,
+    left: 100
+    };
 //Define dimensions of the chart area
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
@@ -41,51 +43,86 @@ var chartGroup = svg
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    //Initial Params
-    var xAxis = "smokes";
-    var yAxis = "age";
+//Setting Params
+var chosenXAxis = "poverty";
+var chosenYAxis = "healthcare";
 
 // function used for updating x-scale var upon click on axis label
-function xScale(stateInfo, XAxis) {
+function xScale(stateInfo, chosenXAxis) {
     // create scales
-    var xLinearScale = d3.scaleLinear()
-      .domain([d3.min(stateInfo, d => d[XAxis]) * 0.8,
-        d3.max(hairData, d => d[chosenXAxis]) * 1.2
+    var xLinearScale = d3
+    .scaleLinear()
+    
+    .domain([
+        d3.min(stateInfo, d => d[chosenXAxis]) * 0.8,
+        d3.max(stateInfo, d => d[chosenXAxis]) * 1.2
       ])
       .range([0, width]);
   
     return xLinearScale;
   
-  }
+  };
 
-// function used for updating xAxis var upon click on axis label
-function renderAxes(newXScale, xAxis) {
-    var bottomAxis = d3.axisBottom(newXScale);
+// function used for updating y-scale var upon click on axis label
+function yScale(stateInfo, chosenYAxis) {
+    // create scales
+    var yLinearScale = d3
+    .scaleLinear()
+    .domain([
+        d3.min(stateInfo, d => d[chosenYAxis]) * 0.8,
+        d3.max(stateInfo, d => d[chosenYAxis]) * 1.2
+      ])
+      .range([height, 0]);
   
-    xAxis.transition()
-      .duration(1000)
-      .call(bottomAxis);
+    return yLinearScale;
+  
+  };
+
+// Function used for updating xAxis var upon click on axis label
+function updateXAxis(newXScale, xAxis) {
+    var bottomAxis = d3.axisBottom(newXScale);
+    xAxis
+        .transition()
+        .duration(1000)
+        .call(bottomAxis);
   
     return xAxis;
-  }
-  
+  };
+
+
+// Function used for updating yAxis var upon click on axis label
+  function updateYAxes (newYScale, yAxis) {
+    var leftAxis = d3.axisLeft(newYScale)
+    yAxis
+        .transition()
+        .duration(1500)
+        .call(leftAxis);
+
+    return yAxis;
+  };
+
 // function used for updating circles group with a transition to
 // new circles
-function renderCircles(circlesGroup, newXScale, XAxis) {
-
-  circlesGroup.transition()
-    .duration(1000)
-    .attr("cx", d => newXScale(d[XAxis]));
-
-  return circlesGroup;
-}
-
+function renderCircles (
+    circlesGroup, 
+    newXScale, 
+    chosenXaxis,
+    newYScale, 
+    chosenYaxis
+    ) {
+    circlesGroup
+    .transition()
+    .duration(1500)
+    .attr('cx', d => newXScale(d[xValue]))
+    .attr('cy', d => newYScale(d[yValue]))
+    return circlesGroup;
+  };
 // function used for updating circles group with new tooltip
-function updateToolTip(XAxis, circlesGroup) {
+function updateToolTip(chosenXAxis, circlesGroup) {
 
     var label;
   
-    if (XAxis === "smokes") {
+    if (chosenXAxis === "smokes") {
       label = "Smokes:";
     }
     else {
@@ -96,7 +133,7 @@ function updateToolTip(XAxis, circlesGroup) {
       .attr("class", "tooltip")
       .offset([80, -60])
       .html(function(d) {
-        return (`${d.abbr}<br>${label} ${d[XAxis]}`);
+        return (`${d.abbr}<br>${label} ${d[chosenXAxis]}`);
       });
   
     circlesGroup.call(toolTip);
@@ -114,19 +151,20 @@ function updateToolTip(XAxis, circlesGroup) {
 
 // Import Data from data.csv
 d3.csv("assets/data/data.csv").then(function(stateInfo) {
-    if (err) throw err;
+//    if (err) throw err;
     console.log(stateInfo);
     
 
     // Step 1: Parse Data/Cast as numbers
     // ==============================
-    healthData.forEach(function(stateInfo) {
+    stateInfo.forEach(function(data) {
     data.smokes = +data.smokes;
     data.age = +data.age;
     });
+    console.log(stateInfo);
 
     // xLinearScale function above csv import
-  var xLinearScale = xScale(stateInfo, XAxis);
+    var xLinearScale = xScale(stateInfo, chosenXAxis);
 
     // Step 2: Create scale functions
     // ==============================
@@ -216,23 +254,23 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
   .text("Smokers vs Age");
 
   // updateToolTip function above csv import
-  var circlesGroup = updateToolTip(XAxis, circlesGroup);
+  var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
   // x axis labels event listener
   labelsGroup.selectAll("text")
     .on("click", function() {
       // get value of selection
       var value = d3.select(this).attr("value");
-      if (value !== XAxis) {
+      if (value !== chosenXAxis) {
 
         // replaces chosenXAxis with value
-        XAxis = value;
+        chosenXAxis = value;
 
-         console.log(XAxis)
+         console.log(chosenXAxis)
 
         // functions here found above csv import
         // updates x scale for new data
-        xLinearScale = xScale(stateInfo, XAxis);
+        xLinearScale = xScale(stateInfo, chosenXAxis);
 
         // updates x axis with transition
         updateXAxis = renderAxes(xLinearScale, updatexXAxis);
@@ -299,9 +337,9 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
 //     console.log(error);
 //   });
 
-// // When the browser loads, makeResponsive() is called.
-// makeResponsive();
+//When the browser loads, makeResponsive() is called.
+makeResponsive();
 
 // // When the browser window is resized, responsify() is called.
-// d3.select(window).on("resize", makeResponsive)
+d3.select(window).on("resize", makeResponsive)
 // };
