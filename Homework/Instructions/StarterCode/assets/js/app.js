@@ -117,12 +117,12 @@ function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup) {
   }
   //Create tooltips
     var toolTip = d3.tip()
-    .attr("class", "tooltip")
-    .offset([90, 90])
-    .html(function(d) {
+        .attr('class', 'tooltip d3-tip')
+        .offset([90, 90])
+        .html(function (d) {
       return `<strong>${d.abbr}</strong><br>${xLabel} ${d[chosenXAxis]}<br>${yLabel} ${d[chosenYAxis]}`
 });
-  //Circles tooltipls with event listeners
+  //Circles tooltips with event listeners
     circlesGroup.call(toolTip);
     circlesGroup.on("mouseover", function(stateInfo) {
       toolTip.show(stateInfo, this);
@@ -135,16 +135,19 @@ function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup) {
 };
 // Import Data from data.csv
 d3.csv("assets/data/data.csv").then(function(stateInfo) {
-//    if (err) throw err;
+  //    if (err) throw err;
     console.log(stateInfo);
     // Step 1: Parse Data/Cast as numbers
-    stateInfo.poverty = +stateInfo.poverty
-    stateInfo.age = +stateInfo.age
-    stateInfo.income = +stateInfo.income
-    stateInfo.healthcare = +stateInfo.healthcare
-    stateInfo.obesity = +stateInfo.obesity
-    stateInfo.smokes = +stateInfo.smokes
+  stateInfo.forEach(function(data) {
+    data.poverty = +data.poverty;
+    data.age = +data.age;
+    data.income = +data.income;
+    data.healthcare = +data.healthcare;
+    data.obesity = +data.obesity;
+    data.smokes = +data.smokes;
+  }); 
     console.log(stateInfo);
+
     //  Step 2: Create scale functions
     // ==============================
     // var xLinearScale = d3.scaleLinear()
@@ -198,18 +201,21 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
     // Create group for three x-axis labels
     var xLabelsGroup = chartGroup.append("g")
     .attr("transform", `translate(${width / 2}, ${height + 20})`);
+
     var poverty = xLabelsGroup.append("text")
     .attr("x", 0)
     .attr("y", 20)
     .attr("value", "poverty") // value to grab for event listener
     .classed("active", true)
     .text("Poverty(%)");
+
     var age = xLabelsGroup.append("text")
     .attr("x", 0)
     .attr("y", 40)
     .attr("value", "age") // value to grab for event listener
     .classed("inactive", true)
     .text("Age(median)");
+
     var income = xLabelsGroup.append("text")
     .attr("x", 0)
     .attr("y", 60)
