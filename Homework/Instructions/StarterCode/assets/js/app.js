@@ -127,7 +127,7 @@ function renderCircles (
 };
 
 // Function used for updating circles group with new tooltip
-function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup,textGroup) {
+function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup, textGroup) {
   if (chosenXAxis === 'poverty') {
     var xLabel = 'Poverty (%)'
   } else if (chosenXAxis === 'age') {
@@ -147,7 +147,7 @@ function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup,textGroup) {
         .attr('class', 'tooltip d3-tip')
         .offset([90, 90])
         .html(function (d) {
-      return `<strong>${d.abbr}</strong><br>${xLabel} ${d[chosenXAxis]}<br>${yLabel} ${d[chosenYAxis]}`
+          return `<strong>${d.abbr}</strong><br>${xLabel} ${d[chosenXAxis]}<br>${yLabel} ${d[chosenYAxis]}`
 });
   //Circles tooltips with event listeners
     circlesGroup.call(toolTip);
@@ -215,9 +215,9 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
     .append("circle")
     .attr("cx", d => xLinearScale(d.chosenXAxis))
     .attr("cy", d => yLinearScale(d.chosenYaxis))
-    .attr("r", "15")
+    .attr("r", "20")
     .attr("fill", "pink")
-    .attr("opacity", ".5");
+    .attr("opacity", ".75");
 
     // Text appended to circles
     var textGroup = chartGroup
@@ -225,8 +225,8 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
     .data(stateInfo)
     .enter()
     .append('text')
-    .attr('x', d => xLinearScale(d[chosenXAxis]))
-    .attr('y', d => yLinearScale(d[chosenYAxis] * 0.90))
+    .attr("x", d => xLinearScale(d[chosenXAxis]))
+    .attr("y", d => yLinearScale(d[chosenYAxis] * 0.90))
     .text(d => d.abbr)
     .attr('class', 'stateText')
     .attr('font-size', '12px')
@@ -313,10 +313,10 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
       if (value !== chosenXAxis) {
         // replaces chosenXAxis with value
         chosenXAxis = value;
-         console.log(chosenXAxis)
+    console.log(chosenXAxis)
         // functions here found above csv import
         // updates x scale for new data
-        xLinearScale = xScale(stateInfo, chosenXAxis);
+        xLinearScale = xScale(stateInfo, value);
         // updates x axis with transition
         xAxis = updateXAxis(xLinearScale, xAxis);
 
@@ -384,6 +384,8 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
       var value = d3.select(this).attr('value')
       if (value !== chosenYAxis) {
         chosenYAxis = value
+    console.log(chosenYAxis);
+
         yLinearScale = yScale(stateInfo, chosenYAxis)
         yAxis = updateYAxes(yLinearScale, yAxis)
         circlesGroup = renderCircles(
@@ -447,10 +449,10 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
       }
     })
   })
-}
+};
 makeResponsive()
 // When Browser Window is Resized, makeResponsive() is Called
-d3.select(window).on('resize', makeResponsive)
+d3.select(window).on('resize', makeResponsive);
 
 
 
