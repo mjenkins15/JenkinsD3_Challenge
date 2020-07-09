@@ -34,8 +34,8 @@ var height = svgHeight - margin.top - margin.bottom;
 var svg = d3
     .select("#scatter")
     .append("svg")
+    .attr("height", svgHeight)
     .attr("width", svgWidth)
-    .attr("height", svgHeight);
 
 // Append a group to the SVG area and shift ('translate') it to the right 
 //and down to adhere to the margins set in the "margin" object.
@@ -140,24 +140,33 @@ function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup, textGroup) {
   } else if (chosenYAxis === 'obesity') {
     var yLabel = 'Obesity (%)'
   } else {
-    var yLabel = 'Smokers (%)'
+    var yLabel = 'Smokes (%)'
   }
   //Create tooltips
     var toolTip = d3.tip()
         .attr('class', 'tooltip d3-tip')
         .offset([90, 90])
         .html(function (d) {
-          return `<strong>${d.abbr}</strong><br>${xLabel} ${d[chosenXAxis]}<br>${yLabel} ${d[chosenYAxis]}`
+          return `<strong>${d.abbr}</strong><br>${xLabel}${d[chosenXAxis]}<br>${yLabel}${d[chosenYAxis]}`
 });
   //Circles tooltips with event listeners
     circlesGroup.call(toolTip);
     circlesGroup.on("mouseover", function(stateInfo) {
       toolTip.show(stateInfo, this)
     })
-    // onmouseout event
-    .on("mouseout", function(stateInfo, index) {
+    // Onmouseout event
+    .on("mouseout", function(stateInfo) {
         toolTip.hide(stateInfo);
       });
+  // Text tooltips with event listeners
+    textGroup.call(toolTip)
+    textGroup.on('mouseover', function(stateInfo) {
+      toolTip.show(stateInfo, this)
+      })
+    // Onmouse event
+    .on('mouseout', function(stateInfo) {
+      toolTip.hide(stateInfo)
+    })
     return circlesGroup;
 };
 // Import Data from data.csv
@@ -221,7 +230,7 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
 
     // Text appended to circles
     var textGroup = chartGroup
-    .selectAll('text')
+    .selectAll()
     .data(stateInfo)
     .enter()
     .append('text')
@@ -260,7 +269,7 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
 
     // Create group for three y-axis labels
     var yLabelsGroup = chartGroup.append("g")
-    .attr("transform", `translate(${-20}, ${height /2})`);
+    .attr("transform", `translate(${-20}, ${height / 2})`);
 
     // Append y-axis
      var healthcare = yLabelsGroup
@@ -274,12 +283,12 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
       .classed('active', true)
       .text('Lacks Healthcare (%)');
     
-      var smokers = yLabelsGroup
+      var smokes = yLabelsGroup
       .append('text')
       .attr('transform', 'rotate(-90)')
       .attr('y', -40)
       .attr('x', 0)
-      .attr('value', 'smokers')
+      .attr('value', 'smokes')
       .attr('dy', '1em')
       .classed('axis-text', true)
       .classed('inactive', true)
@@ -290,7 +299,7 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
       .attr('transform', 'rotate(-90)')
       .attr('y', -60)
       .attr('x', 0)
-      .attr('value', 'healthcare')
+      .attr('value', 'obesity')
       .attr('dy', '1em')
       .classed('axis-text', true)
       .classed('inactive', true)
@@ -326,7 +335,7 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
           xLinearScale,
           chosenXAxis,
           yLinearScale,
-          chosenYAxis
+          chosenYAxis,
         );
 
         textGroup = renderText(
@@ -343,17 +352,18 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
           circlesGroup,
           textGroup
         );
+        
         // changes classes to change bold text
         if (chosenXAxis === "poverty") {
           poverty
             .classed("active", true)
             .classed("inactive", false);
           age
-            .classed("active", true)
-            .classed("inactive", false);
+            .classed("active", false)
+            .classed("inactive", true);
           income
-            .classed("active", true)
-            .classed("inactive", false);
+            .classed("active", false)
+            .classed("inactive", true);
         }
         else if (chosenXAxis === 'age') {
           poverty
@@ -396,42 +406,42 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
           chosenYAxis
         );
 
-        // Updates Text with New Values
-        textGroup = renderText(
-          textGroup,
-          xLinearScale,
-          chosenXAxis,
-          yLinearScale,
-          chosenYAxis
-        );
+        // // Updates Text with New Values
+        // textGroup = renderText(
+        //   textGroup,
+        //   xLinearScale,
+        //   chosenXAxis,
+        //   yLinearScale,
+        //   chosenYAxis
+        // );
 
-        // Updates Tooltips with New Information
-        circlesGroup = updateToolTip(
-          chosenXAxis,
-          chosenYAxis,
-          circlesGroup,
-          textGroup
-        );
+        // // Updates Tooltips with New Information
+        // circlesGroup = updateToolTip(
+        //   chosenXAxis,
+        //   chosenYAxis,
+        //   circlesGroup,
+        //   textGroup
+        // );
         
         if (chosenYAxis === 'healthcare') {
           healthcare
             .classed('active', true)
             .classed('inactive', false);
-          obesity
+          smokes
             .classed('active', false)
             .classed('inactive', true);
-          smokers
+          obesity
             .classed('active', false)
             .classed('inactive', true);
         } 
-        else if (chosenYAxis === 'obesity') {
+        else if (chosenYAxis === 'smokes') {
           healthcare
             .classed('active', false)
             .classed('inactive', true);
-          obesity
+          smokes
             .classed('active', true)
             .classed('inactive', false);
-          smokers
+          obesity
             .classed('active', false)
             .classed('inactive', true);
         }
@@ -439,10 +449,10 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
           healthcare
             .classed('active', false)
             .classed('inactive', true);
-          obesity
+          smokes
             .classed('active', false)
             .classed('inactive', true);
-          smokers
+          obesity
             .classed('active', true)
             .classed('inactive', false);
         }
@@ -450,7 +460,7 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
     })
   })
 };
-makeResponsive()
+makeResponsive();
 // When Browser Window is Resized, makeResponsive() is Called
 d3.select(window).on('resize', makeResponsive);
 
