@@ -9,29 +9,30 @@ function makeResponsive() {
   if (!svgArea.empty()) {
     svgArea.remove();
   }
-    // SVG wrapper dimensions are determined by the current width
-    // and height of the browser window.
-    var svgWidth = window.innerWidth *.50;
-    var svgHeight = window.innerHeight * .50;
-    // Define SVG area dimensions
-    //var svgWidth = 960;
-    //var svgHeight = 600;
-    // Define the chart's margins as an object
-  
-    var margin = {
-    top: 100,
-    right: 100,
-    bottom: 100,
-    left: 100
-    };
 
-//Define dimensions of the chart area
-var width = svgWidth - margin.left - margin.right;
-var height = svgHeight - margin.top - margin.bottom;
+  // SVG wrapper dimensions are determined by the current width
+  // and height of the browser window.
+  var svgWidth = window.innerWidth *.50;
+  var svgHeight = window.innerHeight * .50;
+  // Define SVG area dimensions
+  //var svgWidth = 960;
+  //var svgHeight = 600;
+  // Define the chart's margins as an object
+
+  var margin = {
+  top: 100,
+  right: 100,
+  bottom: 100,
+  left: 100
+  };
+
+  //Define dimensions of the chart area
+  var width = svgWidth - margin.left - margin.right;
+  var height = svgHeight - margin.top - margin.bottom;
 
 //Create an SVG wrapper, append an SVG group that will 
 //hold our chart, and shift the latter by left and top margins.
-var svg = d3
+  var svg = d3
     .select("#scatter")
     .append("svg")
     .attr("height", svgHeight)
@@ -39,40 +40,185 @@ var svg = d3
 
 // Append a group to the SVG area and shift ('translate') it to the right 
 //and down to adhere to the margins set in the "margin" object.
-var chartGroup = svg
+  var chartGroup = svg
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-//Setting Params
-var chosenXAxis = "poverty";
-var chosenYAxis = "healthcare";
+  //Setting Params
+  var chosenXAxis = "poverty";
+  var chosenYAxis = "healthcare";
 
-// function used for updating x-scale var upon click on axis label
-function xScale(stateInfo, chosenXAxis) {
-  // create scales
-  var xLinearScale = d3
-  .scaleLinear()
-  .domain([
-    d3.min(stateInfo, d => d[chosenXAxis]) * 0.8,
-    d3.max(stateInfo, d => d[chosenXAxis]) * 1.2
-      ])
-    .range([0, width]);
-  return xLinearScale;
-};
+  // function used for updating x-scale var upon click on axis label
+//   function xScale(stateInfo, chosenXAxis) {
+//     // create scales
+//     var xLinearScale = d3
+//       .scaleLinear()
+//       .domain([
+//         d3.min(stateInfo, d => d[chosenXAxis]) * 0.8,
+//         d3.max(stateInfo, d => d[chosenXAxis]) * 1.2
+//           ])
+//         .range([0, width]);
+//       return xLinearScale;
+//   };
 
-// function used for updating y-scale var upon click on axis label
-function yScale(stateInfo, chosenYAxis) {
+//   // function used for updating y-scale var upon click on axis label
+//   function yScale(stateInfo, chosenYAxis) {
 
-  // create scales
-  var yLinearScale = d3
-    .scaleLinear()
-    .domain([
-      d3.min(stateInfo, d => d[chosenYAxis]) * 0.8,
-      d3.max(stateInfo, d => d[chosenYAxis]) * 1.2
-  ])
-    .range([height, 0]);
-  return yLinearScale;
-};
+//     // create scales
+//     var yLinearScale = d3
+//       .scaleLinear()
+//       .domain([
+//         d3.min(stateInfo, d => d[chosenYAxis]) * 0.8,
+//         d3.max(stateInfo, d => d[chosenYAxis]) * 1.2
+//     ])
+//       .range([height, 0]);
+//     return yLinearScale;
+//   };
+
+// // Function used for updating xAxis var upon click on axis label
+// function updateXAxis(newXScale, xAxis) {
+//   var bottomAxis = d3.axisBottom(newXScale);
+//   xAxis
+//     .transition()
+//     .duration(1000)
+//     .call(bottomAxis);
+//     return xAxis;
+// };
+// // Function used for updating yAxis var upon click on axis label
+// function updateYAxes (newYScale, yAxis) {
+//   var leftAxis = d3.axisLeft(newYScale);
+//   yAxis
+//     .transition()
+//     .duration(1500)
+//     .call(leftAxis);
+//     return yAxis;
+// };
+// // function used for updating circles group with a transition to
+// // new circles
+// function renderCircles (
+//   circlesGroup, 
+//   newXScale, 
+//   chosenXAxis,
+//   newYScale, 
+//   chosenYAxis
+//   ) {
+//   circlesGroup
+//     .transition()
+//     .duration(1500)
+//     .attr('cx', d => newXScale(d[chosenXAxis]))
+//     .attr('cy', d => newYScale(d[chosenYAxis]))
+//     return circlesGroup;
+// };
+
+//  // update text transition
+//  function renderText (
+//   textGroup,
+//   newXScale,
+//   chosenXAxis,
+//   newYScale,
+//   chosenYAxis
+// ) {
+//   textGroup
+//     .transition()
+//     .duration(1500)
+//     .attr('x', d => newXScale(d[chosenXAxis]))
+//     .attr('y', d => newYScale(d[chosenYAxis]))
+//     .attr('text-anchor', 'middle') 
+//   return textGroup
+// };
+
+// // Function used for updating circles group with new tooltip
+// function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup, textGroup) {
+//   if (chosenXAxis === 'poverty') {
+//     var xLabel = 'Poverty (%)'
+//   } else if (chosenXAxis === 'age') {
+//     var xLabel = 'Age (median)'
+//   } else {
+//     var xLabel = 'Income (median)'
+//   }
+//   if (chosenYAxis === 'healthcare') {
+//     var yLabel = 'Healthcare (%)'
+//   } else if (chosenYAxis === 'obesity') {
+//     var yLabel = 'Obesity (%)'
+//   } else {
+//     var yLabel = 'Smokes (%)'
+//   }
+//   //Create tooltips
+//     var toolTip = d3.tip()
+//         .attr('class', 'tooltip d3-tip')
+//         .offset([90, 90])
+//         .html(function (d) {
+//           return `<strong>${d.abbr}</strong><br>${xLabel}${d[chosenXAxis]}<br>${yLabel}${d[chosenYAxis]}`
+// });
+//   //Circles tooltips with event listeners
+//     circlesGroup.call(toolTip);
+//     circlesGroup.on("mouseover", function(stateInfo) {
+//       toolTip.show(stateInfo, this)
+//     })
+//     // Onmouseout event
+//     .on("mouseout", function(stateInfo) {
+//         toolTip.hide(stateInfo);
+//       });
+//   // Text tooltips with event listeners
+//     textGroup.call(toolTip)
+//     textGroup.on('mouseover', function(stateInfo) {
+//       toolTip.show(stateInfo, this)
+//       })
+//     // Onmouse event
+//     .on('mouseout', function(stateInfo) {
+//       toolTip.hide(stateInfo)
+//     })
+//     return circlesGroup;
+// };
+// Import Data from data.csv
+d3.csv("assets/data/data.csv").then(function(stateInfo) {
+//    if (err) throw err;
+    //console.log(stateInfo);
+    // Step 1: Parse Data/Cast as numbers
+    stateInfo.forEach(function(data) {
+      data.poverty = +data.poverty;
+      data.age = +data.age;
+      data.income = +data.income;
+      data.healthcare = +data.healthcare;
+      data.obesity = +data.obesity;
+      data.smokes = +data.smokes;
+    }); 
+      console.log(stateInfo);
+  //Setting Params
+  var chosenXAxis = "poverty";
+  var chosenYAxis = "healthcare";
+
+  function xScale(stateInfo, chosenXAxis) {
+    // console.log(stateInfo);
+    // console.log(chosenXAxis);
+    // create scales
+    if(chosenXAxis) {
+
+    }
+    var x = chosenXAxis ? chosenXAxis : 'poverty';
+    var xLinearScale = d3
+      .scaleLinear()
+      .domain([
+        d3.min(stateInfo, d => d[chosenXAxis]) * 0.8,
+        d3.max(stateInfo, d => d[chosenXAxis]) * 1.2
+          ])
+        .range([0, width]);
+      return xLinearScale;
+  };
+
+  // function used for updating y-scale var upon click on axis label
+  function yScale(stateInfo, chosenYAxis) {
+
+    // create scales
+    var yLinearScale = d3
+      .scaleLinear()
+      .domain([
+        d3.min(stateInfo, d => d[chosenYAxis]) * 0.8,
+        d3.max(stateInfo, d => d[chosenYAxis]) * 1.2
+    ])
+      .range([height, 0]);
+    return yLinearScale;
+  };
 
 // Function used for updating xAxis var upon click on axis label
 function updateXAxis(newXScale, xAxis) {
@@ -169,20 +315,7 @@ function updateToolTip (chosenXAxis, chosenYAxis, circlesGroup, textGroup) {
     })
     return circlesGroup;
 };
-// Import Data from data.csv
-d3.csv("assets/data/data.csv").then(function(stateInfo) {
-  //    if (err) throw err;
-    //console.log(stateInfo);
-    // Step 1: Parse Data/Cast as numbers
-  stateInfo.forEach(function(data) {
-    data.poverty = +data.poverty;
-    data.age = +data.age;
-    data.income = +data.income;
-    data.healthcare = +data.healthcare;
-    data.obesity = +data.obesity;
-    data.smokes = +data.smokes;
-  }); 
-    console.log(stateInfo);
+  
 
     //  Step 2: Create scale functions
     // ==============================
@@ -234,8 +367,8 @@ d3.csv("assets/data/data.csv").then(function(stateInfo) {
     .data(stateInfo)
     .enter()
     .append('text')
-    .attr("x", d => xLinearScale(d[chosenXAxis]))
-    .attr("y", d => yLinearScale(d[chosenYAxis] * 0.90))
+    .attr("x", d => xLinearScale(d.chosenXAxis))
+    .attr("y", d => yLinearScale(d.chosenYaxis * 0.90))
     .text(d => d.abbr)
     .attr('class', 'stateText')
     .attr('font-size', '12px')
